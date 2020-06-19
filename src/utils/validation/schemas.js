@@ -27,6 +27,7 @@ const schemas = {
   user: Joi.object()
     .options({ abortEarly: false, allowUnknown: true })
     .keys({
+      userName: Joi.string(),
       email: Joi.string().email({ tlds: { allow: false } }),
       password: Joi.string().custom((value, helpers) => {
         const password = value.trim();
@@ -85,7 +86,12 @@ const schemas = {
         .min(1)
         .max(1000),
       optional: optionalScheme
-    })
+    }),
+  userData: Joi.object().keys({
+    lerningWords: Joi.array().items(Joi.string()),
+    hardWords: Joi.array().items(Joi.string()),
+    deletedWords: Joi.array().items(Joi.string())
+  })
 };
 
 function optionalValidator(value, helpers) {

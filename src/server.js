@@ -27,3 +27,4 @@ db.on('error', () => logger.error('MongoDB connection error:')).once(
     );
   }
 );
+// MONGO_CONNECTION_STRING=mongodb+srv://apprslang:apprslang2020@cluster0-zprds.mongodb.net/learn-words?authSource=admin&replicaSet=Cluster0-shard-0&readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=true

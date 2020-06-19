@@ -71,6 +71,8 @@ components:
     User:
       type: object
       properties:
+        userName:
+          type: string
         email:
           type: string
         password:
@@ -84,6 +86,23 @@ components:
           type: string
         userId:
           type: string
+    UserData:
+      type: object
+      properties:
+        id:
+          type: string
+        lerningWords:
+          type: array
+          items:
+            type: string
+        hardWords:
+          type: array
+          items:
+            type: string
+        deletedWords:
+          type: array
+          items:
+            type: string
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -211,6 +230,9 @@ paths:
               type: object
               title: example
               properties:
+                userName:
+                  type: string
+                  description: Name of user
                 email:
                   type: string
                   description: E-mail
@@ -524,6 +546,60 @@ paths:
           description: Bad request
         401:
           $ref: '#/components/responses/UnauthorizedError'
+  /users/{id}/user-data:
+    parameters:
+      - name: id
+        description: userId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - UserData
+      summary: Get user data (statistic)
+      description: Get user data (statistic)
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: User not found
+    put:
+      tags:
+        - UserData
+      summary: Update user data (statistic)
+      description: Update user data (statistic)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: example
+              properties:
+                lerningWords:
+                  type: string
+                hardWords:
+                  type: string
+                deletedWords:
+                  type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: User not found
   /signin:
     post:
       tags:
