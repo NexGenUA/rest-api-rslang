@@ -89,8 +89,6 @@ components:
     UserData:
       type: object
       properties:
-        id:
-          type: string
         lerningWords:
           type: array
           items:

@@ -6,13 +6,15 @@ const { validator } = require('../../utils/validation/validator');
 
 router.get('/', async (req, res) => {
   const data = await userDataService.get(req.userId);
-  res.status(OK).send(data.toResponse());
+  const { lerningWords, hardWords, deletedWords } = data;
+  res.status(OK).send({ lerningWords, hardWords, deletedWords });
 });
 
 router.put('/', validator(userData, 'body'), async (req, res) => {
   console.log(req.userId, req.body);
   const data = await userDataService.update(req.userId, req.body);
-  res.status(OK).send(data.toResponse());
+  const { lerningWords, hardWords, deletedWords } = data;
+  res.status(OK).send({ lerningWords, hardWords, deletedWords });
 });
 
 module.exports = router;
