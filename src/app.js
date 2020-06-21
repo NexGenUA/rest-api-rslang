@@ -15,8 +15,8 @@ const wordRouter = require('./resources/words/word.router');
 const signinRouter = require('./resources/authentication/signin.router');
 const userRouter = require('./resources/users/user.router');
 const userWordsRouter = require('./resources/userWords/userWord.router');
+const aggregatedWordsRouter = require('./resources/aggregatedWords/aggregatedWord.router');
 const statisticRouter = require('./resources/statistics/statistic.router');
-const userDataRouter = require('./resources/userData/userData.router');
 const settingRouter = require('./resources/settings/setting.router');
 const errorHandler = require('./errors/errorHandler');
 const checkAuthentication = require('./resources/authentication/checkAuthentication');
@@ -58,11 +58,11 @@ app.use('/users', userRouter);
 
 userRouter.use('/:id/words', userIdValidator, userWordsRouter);
 
+userRouter.use('/:id/aggregatedWords', userIdValidator, aggregatedWordsRouter);
+
 userRouter.use('/:id/statistics', userIdValidator, statisticRouter);
 
 userRouter.use('/:id/settings', userIdValidator, settingRouter);
-
-userRouter.use('/:id/user-data', userIdValidator, userDataRouter);
 
 app.use((req, res, next) => next(createError(NOT_FOUND)));
 

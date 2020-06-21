@@ -34,11 +34,7 @@ const save = async user => {
 };
 
 const update = async (id, user) =>
-  User.findOneAndUpdate(
-    { _id: id },
-    { $set: user },
-    { upsert: true, new: true }
-  );
+  User.findOneAndUpdate({ _id: id }, { $set: user });
 
 const remove = async id => User.deleteOne({ _id: id });
 
