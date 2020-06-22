@@ -5,6 +5,7 @@ const usersRepo = require('./user.db.repository');
 const statisticService = require('../statistics/statistic.service');
 const settingsService = require('../settings/setting.service');
 const userDataService = require('../userData/userData.service');
+const { defaultSettings } = require('../../utils/mock/defaultMock');
 
 const authenticate = async user => {
   const userEntity = await usersRepo.getUserByEmail(user.email);
@@ -21,7 +22,9 @@ const get = id => usersRepo.get(id);
 
 const save = async user => {
   const response = await usersRepo.save(user);
-  await userDataService.set(response.id);
+  const id = response.id;
+  await userDataService.set(id);
+  await settingsService.upsert(id, { ...defaultSettings, id });
   return response;
 };
 
