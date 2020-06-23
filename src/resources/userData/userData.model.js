@@ -4,7 +4,7 @@ const { addMethods } = require('../../utils/toResponse');
 
 const UserDataSchema = new Schema(
   {
-    lerningWords: {
+    learningWords: {
       type: [String],
       default: []
     },

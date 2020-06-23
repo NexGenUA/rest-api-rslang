@@ -88,7 +88,7 @@ const schemas = {
       optional: optionalScheme
     }),
   userData: Joi.object().keys({
-    lerningWords: Joi.array().items(Joi.string()),
+    learningWords: Joi.array().items(Joi.string()),
     hardWords: Joi.array().items(Joi.string()),
     deletedWords: Joi.array().items(Joi.string())
   })

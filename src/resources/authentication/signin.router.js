@@ -14,7 +14,9 @@ router.route('/').post(async (req, res) => {
   res.status(OK).json({
     message: 'Authenticated',
     token,
-    userId: user.id
+    userId: user.id,
+    email: user.email,
+    name: user.name
   });
 });
 

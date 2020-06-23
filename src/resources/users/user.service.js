@@ -15,7 +15,11 @@ const authenticate = async user => {
     throw new AUTHENTICATION_ERROR();
   }
 
-  return { id: userEntity._id };
+  return {
+    id: userEntity._id,
+    email: userEntity.email,
+    name: userEntity.userName
+  };
 };
 
 const get = id => usersRepo.get(id);
