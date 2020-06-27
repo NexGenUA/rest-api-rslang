@@ -445,7 +445,7 @@ paths:
       - name: group
         in: query
         required: false
-        description: group
+        description: group(skip if you want result not depending on a group)
         schema:
           type: string
       - name: wordsPerPage
@@ -463,12 +463,6 @@ paths:
           Get all words that have BOTH difficulty equal="easy" AND optional.repeat=true, OR do not have the linked userWord <pre>{"$or":[{"$and":[{"userWord.difficulty":"easy", "userWord.optional.repeat":true}]},{"userWord":null}]}</pre><br>
         schema:
           type: string
-      - name: onlyUserWords
-        in: query
-        required: false
-        description: get words that have linked UserWord only
-        schema:
-          type: boolean
     get:
       tags:
         - Users/AggregatedWords
