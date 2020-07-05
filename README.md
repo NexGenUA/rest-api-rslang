@@ -16,7 +16,72 @@ A backend part of [Front-End Stage#2 RS.School task](https://github.com/rolling-
 
 GET для получения списка слов:
 `https://api-rslang.herokuapp.com/words?page=2&group=0` - получить слова со 2-й страницы группы 0  
-Строка запроса должна содержать в себе номер группы и номер страницы. Всего 6 групп(от 0 до 5) и в каждой группе по 30 страниц(от 0 до 29). В каждой странице по 20 слов. Группы разбиты по сложности от самой простой(0) до самой сложной(5).
+Строка запроса должна содержать в себе номер группы и номер страницы. Всего 6 групп(от 0 до 5) и в каждой группе по 30 страниц(от 0 до 29). В каждой странице по 20 слов. Группы разбиты по сложности от самой простой(0) до самой сложной(5).  
+
+##### Word+Assets
+
+GET запрос для получения одного слова по ID возвращает слово в виде JSON объекта в котором поля `image`, `audio`, `audioMeaning` и `audioExample` содержат изображения и аудиофайлы закодированные в `base64`.  
+Пример получения и преобразования `base64` данных в соответствующие теги HTML:  
+```html
+<html>
+<body></body>
+<script>
+  fetch('https://api-rslang.herokuapp.com/words/5e9f5ee35eb9e72bc21af4a0')
+    .then(r => r.json())
+    .then(data => {
+      const image = new Image();
+      image.src = `data:image/jpg;base64,${data.image}`;
+      document.body.appendChild(image);
+      const audio = new Audio();
+      audio.src = `data:audio/mpeg;base64,${data.audio}`;
+      audio.controls = 'controls';
+      document.body.appendChild(audio);
+    })
+</script>
+</html>
+```
+
+### Sign In
+
+Чтобы пользоваться эндпоинтами требующими авторизации необходимо залогиниться в систему и получить JWT токен. Для этого существует POST эндоинт по адресу `/signin`. Токены имеют ограниченный срок жизни, в текущей реализации это 4 часа с момента получения. Пример запроса:  
+```javascript
+const loginUser = async user => {
+  const rawResponse = await fetch('https://api-rslang.herokuapp.com/signin', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(user)
+  });
+  const content = await rawResponse.json();
+
+  console.log(content);
+};
+
+loginUser({ "email": "hello@user.com", "password": "Gfhjkm_123" });
+-------------------------------------------------------------------
+Console: 
+{
+  "message":"Authenticated",
+  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlYzk5M2RmNGNhOWQ2MDAxNzg3NDBhZSIsImlhdCI6MTU5MDI2OTE1OCwiZXhwIjoxNTkwMjgzNTU4fQ.XHKmdY_jk1R7PUbgCZfqH8TxH6XQ0USwPBSKNHMdF6I",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlYzg5NDI4NzhjMWU4NGI0M2U4NzFhYyIsInRva2VuSWQiOiI3MTBiODZjZS1hMTJjLTQ3YzMtYjkzYy1kNDUzZmJiYmI0OGIiLCJpYXQiOjE1OTM3MDE5NTcsImV4cCI6MTU5MzcxNjM1N30.7wgIfUG_3fUcpb-yoZVm4pPzgdvkQvulOWiL3x7y85E",
+  "userId":"5ec993df4ca9d600178740ae",
+  "name": "TestUser",
+  "email": "email@email.com"
+}
+```
+
+### Refresh JWT token
+
+JWT токен это JSON объект состоящий из трех частей(header, payload and signature), который закодирован `Base64`. В этом можно убедиться вставив полученный токен в соответствующее поле на сайте [jwt.io](https://jwt.io/#debugger-io). Если посмотреть на декодированный результат, то в `payload` можно увидеть поле `exp` это представление даты в миллисекундах до которой будет валидным токен. В браузерном API есть [функции которые позволяют кодировать/декодировать `Base64`](https://developer.mozilla.org/en-US/docs/Glossary/Base64).  
+В API существует GET эндпоинт `/users/{id}/tokens` который позволяет получить свежий токен без повторной авторизации. Запросы к этому эндпоинту должны быть подписаны **refreshToken** полученном в ответе сервера после аутентификации пользователя. Успешный запрос к этому эндпоинту вернет новые токен и рефреш-токен.
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlYzg5NDI4NzhjMWU4NGI0M2U4NzFhYyIsImlhdCI6MTU5MzcwMzQxNiwiZXhwIjoxNTkzNzE3ODE2fQ.6IKvBYz49az9ioasHZQB63NIXujXkY5K1pHMxYJ_-FE",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlYzg5NDI4NzhjMWU4NGI0M2U4NzFhYyIsInRva2VuSWQiOiJjMDg3MDk2My1hNjhmLTRlMzUtYWYyNS03Mjg2ZDk0NmVhMmQiLCJpYXQiOjE1OTM3MDM0MTYsImV4cCI6MTU5MzcxNzgxNn0.fBHuICfTYePElVcmYyl7ZW2Qnzw0iHyFdNr7-KiRpG4"
+}
+```
 
 ### Users
 
@@ -181,7 +246,7 @@ const createUserWord = async (userId) => {
 
 ```javascript
 updateData = {
-  lerningWords:	['wordId-1', 'wordId-3', 'wordId-7'],
+  learningWords:	['wordId-1', 'wordId-3', 'wordId-7'],
   hardWords:	['wordId-11', 'wordId-21', 'wordId-32'],
   deletedWords:	['wordId-55', 'wordId-63', 'wordId-100']
 }

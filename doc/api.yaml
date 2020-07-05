@@ -71,7 +71,7 @@ components:
     User:
       type: object
       properties:
-        userName:
+        name:
           type: string
         email:
           type: string
@@ -83,6 +83,8 @@ components:
         message:
           type: string
         token:
+          type: string
+        refreshToken:
           type: string
         userId:
           type: string
@@ -108,6 +110,8 @@ components:
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
+    UnauthenticatedError:
+      description: Access token is missing, expired or invalid
   securitySchemes:
     bearerAuth:
       type: http
@@ -202,13 +206,19 @@ paths:
         required: true
         schema:
           type: string
+      - name: noAssets
+        in: query
+        required: false
+        description: if true then get word with pathes to assets instead from assets itself
+        schema:
+          type: string
     get:
       tags:
         - Words
       security:
         []
-      summary: Get a word by id
-      description: Gets a word by id
+      summary: Get a word with assets by id
+      description: Gets a word with assets by id
       responses:
         200:
           description: Successful operation
@@ -232,9 +242,9 @@ paths:
               type: object
               title: example
               properties:
-                userName:
+                name:
                   type: string
-                  description: Name of user
+                  description: User name
                 email:
                   type: string
                   description: E-mail
@@ -287,9 +297,9 @@ paths:
               type: object
               title: example
               properties:
-                userName:
+                name:
                   type: string
-                  description: Name of user
+                  description: User name
                 email:
                   type: string
                   description: E-mail
@@ -317,6 +327,28 @@ paths:
           description: The user has been deleted
         401:
           $ref: '#/components/responses/UnauthorizedError'
+  /users/{id}/tokens:
+    parameters:
+      - name: id
+        description: user id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Users
+      summary: Get new user tokens
+      description: Gets new user tokens
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Auth"
+        403:
+          $ref: '#/components/responses/UnauthenticatedError'
   /users/{id}/words:
     parameters:
       - name: id
@@ -339,7 +371,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserWord"
-        401:
+        402:
           $ref: '#/components/responses/UnauthorizedError'
   /users/{id}/words/{wordId}:
     parameters:
