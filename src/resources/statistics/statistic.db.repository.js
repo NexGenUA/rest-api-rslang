@@ -10,6 +10,10 @@ const get = async userId => {
   return statistic;
 };
 
+const set = async (userId, statistics) => {
+  return await Statistics.create({ userId, ...statistics });
+};
+
 const upsert = async (userId, statistic) =>
   Statistics.findOneAndUpdate(
     { userId },
@@ -19,4 +23,4 @@ const upsert = async (userId, statistic) =>
 
 const remove = async userId => Statistics.deleteOne({ userId });
 
-module.exports = { get, upsert, remove };
+module.exports = { get, upsert, remove, set };

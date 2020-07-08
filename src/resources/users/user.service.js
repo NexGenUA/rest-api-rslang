@@ -32,6 +32,7 @@ const save = async user => {
   const response = await usersRepo.save(user);
   const id = response.id;
   await userDataService.set(id);
+  await statisticService.set(id);
   await settingsService.upsert(id, { ...defaultSettings, id });
   return response;
 };

@@ -1,10 +1,17 @@
 const statisticRepo = require('./statistic.db.repository');
+const { defaultStatistics } = require('../../utils/mock/defaultMock');
 
 const get = async userId => statisticRepo.get(userId);
 
-const upsert = async (userId, statistic) =>
-  statisticRepo.upsert(userId, { ...statistic, userId });
+const set = async userId => statisticRepo.set(userId, defaultStatistics);
+
+const upsert = async (userId, statistic) => {
+  const stats = await get(userId);
+  const { learnedWords, optional } = stats;
+  const optionals = { ...optional, ...statistic.optional };
+  return statisticRepo.upsert(userId, { optional: optionals, learnedWords });
+};
 
 const remove = async userId => statisticRepo.remove(userId);
 
-module.exports = { get, upsert, remove };
+module.exports = { get, upsert, remove, set };
