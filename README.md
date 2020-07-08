@@ -580,8 +580,6 @@ const filter: AggregatedFilter = { 'userWord.optional.learned': true };
 
 Найдет все слова к которым через api `createUserWordByWordId`  мы добавили соответствующее значение:
 
------
-
 ```javascript
 this.apiService.createUserWordByWordId('23ffdrweJLla4rqwe23q4',
       { 
@@ -589,6 +587,8 @@ this.apiService.createUserWordByWordId('23ffdrweJLla4rqwe23q4',
           optional: { learned: true }
       })
 ```
+
+-----
 
 ```javascript
 const filter: AggregatedFilter = { userWord: null };
