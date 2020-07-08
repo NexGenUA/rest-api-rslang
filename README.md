@@ -505,6 +505,7 @@ Download
 В фильтре также можно обращаться к полям optional объекта userWord:  
 `"userWord.optional.key":value`
 
+-----
 
 ### getUserAggregatedWords метод
 
