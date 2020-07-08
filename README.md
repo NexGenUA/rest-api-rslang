@@ -506,7 +506,9 @@ Download
 `"userWord.optional.key":value`
 
 
-### Описание работы с методом `getUserAggregatedWords` сервиса `src/app/shared/services/api.service.ts` 
+### getUserAggregatedWords метод
+
+Описание работы с методом `getUserAggregatedWords` сервиса `src/app/shared/services/api.service.ts` 
 
 Пример вызова:
 
