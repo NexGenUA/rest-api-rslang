@@ -578,7 +578,7 @@ const filter: AggregatedFilter = { word: 'alcohol' };
 const filter: AggregatedFilter = { 'userWord.optional.learned': true };
 ```
 
-Найдет все слова к которым через api `createUserWordByWordId`  мы добавили соответствующее значение:
+Найдет все слова к которым через метод `createUserWordByWordId`  мы добавили соответствующее значение:
 
 ```javascript
 this.apiService.createUserWordByWordId('23ffdrweJLla4rqwe23q4',
