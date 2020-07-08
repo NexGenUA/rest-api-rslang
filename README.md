@@ -503,6 +503,163 @@ Download
 Для преобразования строки filter в валидный query-параметр можно использовать следующую функцию: [encodeURIComponent()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)  
 
 В фильтре также можно обращаться к полям optional объекта userWord:  
-`"userWord.optional.key":value`  
+`"userWord.optional.key":value`
+
+
+### Описание работы с методом `getUserAggregatedWords` сервиса `src/app/shared/services/api.service.ts` 
+
+Пример вызова:
+
+```javascript
+this.apiService.getUserAggregatedWords(filter, 10, 0)
+      .subscribe(res => {
+        console.log(res[0].paginatedResults);
+        console.log(res[0].totalCount[0].count);
+      })
+```
+
+- `res[0].paginatedResults` - тут находится массив слов, которые вернул сервис
+- В переменной `res[0].totalCount[0].count` указано сколько слов попало под выборку (по умолчанию возвращается не больше 10 слов, если параметр `wordsPerPage` не указан)
+
+```javascript
+this.apiService.getUserAggregatedWords(null, 3600)
+```
+
+Если не указывать фильтр и указать `wordsPerPage` - 3600, то вернет все 3600 слов в одном ответе
+
+```javascript
+this.apiService.getUserAggregatedWords(null, 3600, 1)
+```
+
+Если указать группу, то венет все слова из этой группы (600 слов)
+
+`getUserAggregatedWords([filter, wordsPerPage, group])`
+
+Метод принимает 3 параметра:
+
+- `filter` - описывает фильтр для получения слов
+- `wordsPerPage` - указывает на количество слов, которые возвратит метод (елси не указать параметр, то по умолчанию вертенся 10 слов)
+- `group` - группа от 0 до 5, в каждой группе по 600 слов (если группу не указать, то фильтр будет работать по всем группам)
+
+Параметры являются не обязательными, 
+
+filter - объект, с одним полем, типы полей такие: 
+
+```json
+{
+  $and: Array<type>,
+  $or: Array<type>,
+  $nor: Array<type>,
+  'userWord.optional.learned': string | type,
+  'userWord.difficulty': string | type,
+  userWord: null | type,
+  word: string | type,
+}
+```
+Детальней можно будет посмотреть в interfaces.ts
+
+**Пример фильтров**
+
+```javascript
+const filter: AggregatedFilter = { word: 'alcohol' };
+```
+Вернет указанное слово
+
+```javascript
+const filter: AggregatedFilter = { 'userWord.optional.learned': true };
+```
+
+Найдет все слова к которым через api `createUserWordByWordId`  мы добавили соответствующее значение:
+
+```javascript
+this.apiService.createUserWordByWordId('23ffdrweJLla4rqwe23q4',
+      { 
+        difficulty: 'hard',
+          optional: { learned: true }
+      })
+```
+
+```javascript
+const filter: AggregatedFilter = { userWord: null };
+```
+
+Найдет все слова которые никогда не добавлялись через `createUserWordByWordId` метод, т.е. если было добавлено 1 слово, то вернется 3599 (по умолчанию возвращается не больше 10 слов, если параметр `wordsPerPage` не указан)
+
+Немного сложнее фильтр, ключ `$or` как значение принимает массив объектов (которые были выше) и найдет все совпадения, которые были в этих объектах:
+
+```javascript
+const filter: AggregatedFilter = {
+      $or: [
+        { 'userWord.difficulty': 'hard' },
+        { 'userWord.difficulty': 'easy' },
+      ]
+    };
+```
+
+Вернет все слова у которых поле `difficulty` будет соотвествующих значений (по умолчанию возвращается не больше 10 слов, если параметр `wordsPerPage` не указан)
+
+
+`$nor` делает противоположное `$or`
+
+```javascript
+const filter: AggregatedFilter = {
+      $nor: [{
+        'userWord.optional.learned': true
+      }]
+    };
+```
+
+Вернет все значения, у которых `learned` не `true`, так же может принимать несколько объектов (по умолчанию возвращается не больше 10 слов, если параметр `wordsPerPage` не указан)
+
+`$and` ищет полные совпадения
+
+```javascript
+const filter: AggregatedFilter = {
+      $and: [
+          { 'userWord.difficulty': 'hard' },
+          { 'userWord.optional.learned': true }
+        ]
+    };
+```
+
+Найдет сначала все слова у которых `difficulty` имеет значение `hard`, потом в этом результате найдет все слова, у которых `learned` - `true` (по умолчанию возвращается не больше 10 слов, если параметр `wordsPerPage` не указан)
+
+Фильтры можно комбинировать и вкладывать друг в друга 
+```javascript
+const filter: AggregatedFilter = {
+      $or: [
+        {
+          $and: [{word: 'alcohol'}, {'userWord.optional.learned': true}]
+        },
+        {
+          $and: [{'userWord.difficulty': 'hard'}, { 'userWord.optional.learned': false}]
+        }
+      ]
+    };
+```
+
+Найдет сначала все совпадения в первом `$and` потом во втором `$and`, а `$or` затем вернет что было в этих двух фильтрах (по умолчанию возвращается не больше 10 слов, если параметр `wordsPerPage` не указан)
+
+Более детально можно почитать тут:
+
+ - [Query Documents](https://docs.mongodb.com/manual/tutorial/query-documents/)  
+ - [Query and Projection Operators](https://docs.mongodb.com/manual/reference/operator/query/#query-and-projection-operators) 
+
+Добавлены не все методы т.к. половина не пригодится, а остальные дублируют друг друга, но если что-то будет нужно и его нет, то напишите я их добавлю, или сами можете добавить в `src/app/shared/types.ts` тип нужного параметра
+
+
+Так же на примере такого фильтра:
+
+```javascript
+const filter: AggregatedFilter = { word: 'alcohol' };
+```
+
+Можно передавать не точное значение, а объект с ключом  `$regex`  значение которого - это регулярное выражение, по которому будут искаться слова, так же не обязательное поле  `$options` - собственно опции `i` - `ignorecase`, `g` - `global` и т.д. стандартные значения, пример:
+
+```javascript
+const filter: AggregatedFilter = { word: { $regex: '\w*wood\*', $options: 'ig'} };
+```
+
+Найдет все слова, в корне которых присутствует wood (по умолчанию возвращается не больше 10 слов, если параметр `wordsPerPage` не указан)
 
 Эндпоинт `/users/{id}/aggregatedWords/{wordId}` позволяет получить агрегированый объект конкретного слова.  
