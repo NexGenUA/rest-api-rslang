@@ -6,10 +6,11 @@ const get = async userId => statisticRepo.get(userId);
 const set = async userId => statisticRepo.set(userId, defaultStatistics);
 
 const upsert = async (userId, statistic) => {
-  const stats = await get(userId);
-  const { learnedWords, optional } = stats;
+  let stats = await statisticRepo.getStatsForUpdate(userId);
+  stats = stats || statistic;
+  const { optional } = stats;
   const optionals = { ...optional, ...statistic.optional };
-  return statisticRepo.upsert(userId, { optional: optionals, learnedWords });
+  return statisticRepo.upsert(userId, { optional: optionals });
 };
 
 const remove = async userId => statisticRepo.remove(userId);
