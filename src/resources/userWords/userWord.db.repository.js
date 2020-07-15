@@ -27,13 +27,13 @@ const save = async (wordId, userId, userWord) => {
 };
 
 const update = async (wordId, userId, userWord) => {
-  const updatedWord = await UserWord.findOneAndUpdate(
+  let updatedWord = await UserWord.findOneAndUpdate(
     { wordId, userId },
     { $set: userWord },
     { new: true }
   );
   if (!updatedWord) {
-    throw new NOT_FOUND_ERROR(ENTITY_NAME, { wordId, userId });
+    updatedWord = await UserWord.create(userWord);
   }
 
   return updatedWord;
